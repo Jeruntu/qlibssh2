@@ -52,6 +52,7 @@ private:
 
     QElapsedTimer timer_;
     std::unique_ptr<QFile> file_;
+    QByteArray buffer_{65536, 0}; // 2^16
 
     // state for sending
     qint64 filePos_{0};

@@ -88,19 +88,15 @@ std::error_code Ssh2Scp::writeFileToServer()
 
     file_->seek(filePos_);
 
-    // https://www.libssh2.org/libssh2_channel_write_ex.html
-    // This means that to get maximum performance when sending larger files,
-    // you should try to always pass in at least 32K of data to this function.
-    QByteArray buffer{65536, 0}; // 2^16
     qint64 totalBytesRead{0};
     do {
-        auto bytesRead = file_->read(buffer.data(), buffer.size());
+        auto bytesRead = file_->read(buffer_.data(), buffer_.size());
         if (bytesRead <= 0) {
             break; // end of file
         }
 
         totalBytesRead += bytesRead;
-        auto* bufferPos = buffer.data();
+        auto* bufferPos = buffer_.data();
 
         do {
             auto writtenBytes = writeData(bufferPos, bytesRead);
@@ -137,18 +133,17 @@ std::error_code Ssh2Scp::receiveFileFromServer()
     if (!file_)
         return Ssh2Error::UnexpectedError;
 
-    QByteArray buffer{65536, 0}; // 2^16
     while (totalReadBytes_ < fileInfo_.st_size) {
         int readBytes{0};
-        int amount = buffer.length();
+        int amount = buffer_.length();
         do {
             if ((fileInfo_.st_size - totalReadBytes_) < amount) {
                 amount = static_cast<int>(fileInfo_.st_size - totalReadBytes_);
             }
 
-            readBytes = readData(buffer.data(), buffer.length());
+            readBytes = readData(buffer_.data(), buffer_.length());
             if (readBytes > 0) {
-                file_->write(buffer.data(), readBytes);
+                file_->write(buffer_.data(), readBytes);
                 totalReadBytes_ += readBytes;
             }
         } while (readBytes > 0);
