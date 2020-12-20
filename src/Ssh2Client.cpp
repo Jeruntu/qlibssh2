@@ -114,14 +114,14 @@ void Ssh2Client::closeChannels()
 
 void Ssh2Client::closeSession()
 {
-    if (ssh2_state_ != FailedToEstablshed)
+    if (ssh2_state_ != FailedToEstablish)
         setSsh2SessionState(Closed);
 }
 
 void Ssh2Client::checkConnection()
 {
     if (state() != QAbstractSocket::ConnectedState) {
-        setSsh2SessionState(FailedToEstablshed, Ssh2Error::ConnectionTimeoutError);
+        setSsh2SessionState(FailedToEstablish, Ssh2Error::ConnectionTimeoutError);
     }
 }
 
@@ -152,7 +152,7 @@ void Ssh2Client::onTcpConnected()
     if (!error_code)
         error_code = startSshSession();
     if (!checkSsh2Error(error_code))
-        setSsh2SessionState(FailedToEstablshed, error_code);
+        setSsh2SessionState(FailedToEstablish, error_code);
 }
 
 void Ssh2Client::onTcpDisconnected()
@@ -166,7 +166,7 @@ std::error_code Ssh2Client::startSshSession()
     std::error_code error_code = ssh2_success;
     const qintptr socket_descriptor = socketDescriptor();
     if (socket_descriptor == -1) {
-        setSsh2SessionState(SessionStates::FailedToEstablshed, Ssh2Error::SessionStartupError);
+        setSsh2SessionState(SessionStates::FailedToEstablish, Ssh2Error::SessionStartupError);
         return error_code;
     }
 
@@ -218,7 +218,7 @@ void Ssh2Client::onReadyRead()
     if (ssh2_state_ != SessionStates::Established &&
         !checkSsh2Error(error_code))
     {
-        setSsh2SessionState(SessionStates::FailedToEstablshed, error_code);
+        setSsh2SessionState(SessionStates::FailedToEstablish, error_code);
     }
 }
 
@@ -241,7 +241,7 @@ void Ssh2Client::onSocketStateChanged(const QAbstractSocket::SocketState& state)
     switch (state) {
     case QAbstractSocket::UnconnectedState:
         if (ssh2_state_ != NotEstableshed) {
-            setSsh2SessionState(FailedToEstablshed, Ssh2Error::TcpConnectionError);
+            setSsh2SessionState(FailedToEstablish, Ssh2Error::TcpConnectionError);
         }
         break;
     case QAbstractSocket::ConnectingState:
@@ -493,7 +493,7 @@ void Ssh2Client::setSsh2SessionState(const Ssh2Client::SessionStates& new_state)
         case Closing:
             closeChannels();
             break;
-        case FailedToEstablshed:
+        case FailedToEstablish:
         case Closed:
         case Aborted:
             destroySsh2Objects();

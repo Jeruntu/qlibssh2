@@ -52,7 +52,7 @@ public:
         GetAuthMethods,
         Authentication,
         Established,
-        FailedToEstablshed,
+        FailedToEstablish,
         Closing,
         Closed,
         Aborted
