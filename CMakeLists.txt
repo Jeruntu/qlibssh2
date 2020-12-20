@@ -18,6 +18,8 @@ add_library(qlibssh2 STATIC
     src/Ssh2Debug.cpp
     src/Ssh2Process.cpp
     src/Ssh2Types.cpp
+    src/Ssh2Scp.cpp
+    src/Ssh2LocalPortForwarding.cpp
 )
 
 target_include_directories(qlibssh2
