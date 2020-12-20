@@ -106,6 +106,23 @@ Ssh2Client::~Ssh2Client()
     freeSsh2();
 }
 
+void Ssh2Client::connectToHost(const QString& hostName, qint16 port)
+{
+    auto splitted = hostName.split(QLatin1Char{'@'});
+    if (splitted.count() == 2) {
+        ssh2_settings_.user = splitted.at(0);
+        return QTcpSocket::connectToHost(splitted.at(1), port);
+    }
+
+    QTcpSocket::connectToHost(hostName, port);
+}
+
+void Ssh2Client::connectToHost(const QString &userName, const QString &hostName, quint16 port)
+{
+    ssh2_settings_.user = userName;
+    QTcpSocket::connectToHost(hostName, port);
+}
+
 Ssh2Client::SessionStates Ssh2Client::sessionState() const
 {
     return ssh2_state_;

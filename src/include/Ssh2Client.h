@@ -66,6 +66,10 @@ public:
 
     ~Ssh2Client();
 
+    using QTcpSocket::connectToHost;
+    void connectToHost(const QString& hostName, qint16 port = 22);
+    void connectToHost(const QString& userName, const QString& hostName, quint16 port = 22);
+
     SessionStates sessionState() const;
 
     void disconnectFromHost() override;
@@ -119,7 +123,7 @@ private:
 
     std::error_code setLastError(const std::error_code& error_code);
 
-    const Ssh2Settings ssh2_settings_;
+    Ssh2Settings ssh2_settings_;
     SessionStates ssh2_state_;
 
     QList<Ssh2AuthMethods> ssh2_available_auth_methods_;
