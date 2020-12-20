@@ -21,12 +21,15 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#include "Precompiled.h"
 #include "Ssh2Client.h"
-
 #include "Ssh2Channel.h"
 #include "Ssh2Process.h"
 #include "Ssh2Debug.h"
+
+#include <libssh2.h>
+
+#include <QtCore/QTimer>
+#include <QtNetwork/QHostAddress>
 
 using namespace daggyssh2;
 
