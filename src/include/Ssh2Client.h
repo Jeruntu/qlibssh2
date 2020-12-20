@@ -33,6 +33,7 @@ namespace daggyssh2
 class Ssh2Process;
 class Ssh2Channel;
 class Ssh2Scp;
+class Ssh2LocalPortForwarding;
 
 class Ssh2Client final : public QTcpSocket
 {
@@ -79,6 +80,11 @@ public:
     QPointer<Ssh2Process> createProcess(const QString& command);
     QPointer<Ssh2Scp> scpSend(const QString& localFilePath, const QString &destinationPath);
     QPointer<Ssh2Scp> scpReceive(const QString& remoteFilePath, const QString &destinationPath);
+    QPointer<Ssh2LocalPortForwarding>
+    localPortForwarding(quint16 localListenPort, const QHostAddress &remoteHost, quint16 remoteListenPort);
+    QPointer<Ssh2LocalPortForwarding>
+    localPortForwarding(const QHostAddress& localHost, quint16 localListenPort,
+                        const QHostAddress &remoteHost, quint16 remoteListenPort);
 
     int channelsCount() const;
     int openChannelsCount() const;

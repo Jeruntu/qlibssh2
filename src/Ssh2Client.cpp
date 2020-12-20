@@ -24,6 +24,7 @@ SOFTWARE.
 #include "Ssh2Client.h"
 #include "Ssh2Channel.h"
 #include "Ssh2Debug.h"
+#include "Ssh2LocalPortForwarding.h"
 #include "Ssh2Process.h"
 #include "Ssh2Scp.h"
 
@@ -117,7 +118,7 @@ void Ssh2Client::connectToHost(const QString& hostName, qint16 port)
     QTcpSocket::connectToHost(hostName, port);
 }
 
-void Ssh2Client::connectToHost(const QString &userName, const QString &hostName, quint16 port)
+void Ssh2Client::connectToHost(const QString& userName, const QString& hostName, quint16 port)
 {
     ssh2_settings_.user = userName;
     QTcpSocket::connectToHost(hostName, port);
@@ -229,7 +230,8 @@ void Ssh2Client::onReadyRead()
     case SessionStates::Authentication:
         error_code = authenticate();
         break;
-    case SessionStates::Established: [[fallthrough]];
+    case SessionStates::Established:
+        [[fallthrough]];
     case SessionStates::Closing:
         for (Ssh2Channel* ssh2_channel : getChannels()) {
             ssh2_channel->checkIncomingData();
@@ -488,18 +490,33 @@ QPointer<Ssh2Process> Ssh2Client::createProcess(const QString& command)
     return ssh2_process;
 }
 
-QPointer<Ssh2Scp> Ssh2Client::scpSend(const QString &localFilePath, const QString &destinationPath)
+QPointer<Ssh2Scp> Ssh2Client::scpSend(const QString& localFilePath, const QString& destinationPath)
 {
     auto* ssh2_scp = new Ssh2Scp(localFilePath, destinationPath, Ssh2Scp::Send, this);
     addChannel(ssh2_scp);
     return ssh2_scp;
 }
 
-QPointer<Ssh2Scp> Ssh2Client::scpReceive(const QString &remoteFilePath, const QString &destinationPath)
+QPointer<Ssh2Scp> Ssh2Client::scpReceive(const QString& remoteFilePath, const QString& destinationPath)
 {
     auto* ssh2_scp = new Ssh2Scp(remoteFilePath, destinationPath, Ssh2Scp::Receive, this);
     addChannel(ssh2_scp);
     return ssh2_scp;
+}
+
+QPointer<Ssh2LocalPortForwarding> Ssh2Client::localPortForwarding(quint16 localListenPort, const QHostAddress& remoteHost, quint16 remoteListenPort)
+{
+    return localPortForwarding(QHostAddress::LocalHost, localListenPort,
+                               remoteHost, remoteListenPort);
+}
+
+QPointer<Ssh2LocalPortForwarding> Ssh2Client::localPortForwarding(const QHostAddress &localListenHost, quint16 localListenPort,
+                                                                  const QHostAddress& remoteHost, quint16 remoteListenPort)
+{
+    auto* ssh2_local_port_forwarding = new Ssh2LocalPortForwarding(localListenHost, localListenPort,
+                                                                   remoteHost, remoteListenPort, this);
+    addChannel(ssh2_local_port_forwarding);
+    return ssh2_local_port_forwarding;
 }
 
 int Ssh2Client::channelsCount() const
@@ -572,8 +589,10 @@ void Ssh2Client::setSsh2SessionState(const Ssh2Client::SessionStates& new_state)
         case Closing:
             closeChannels();
             break;
-        case FailedToEstablish: [[fallthrough]];
-        case Closed: [[fallthrough]];
+        case FailedToEstablish:
+            [[fallthrough]];
+        case Closed:
+            [[fallthrough]];
         case Aborted:
             destroySsh2Objects();
             break;
