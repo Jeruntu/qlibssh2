@@ -57,6 +57,7 @@ public:
         Closed,
         Aborted
     };
+    Q_ENUM(SessionStates)
 
     Ssh2Client(Ssh2Settings ssh2_settings_,
                QObject* parent = nullptr);
