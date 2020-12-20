@@ -171,6 +171,7 @@ void Ssh2LocalPortForwarding::onReadyReadForward()
             } else {
                 bufferPos += writtenBytes;
                 bytesRead -= writtenBytes;
+                ssh2Client()->flush();
             }
         } while (bytesRead);
     } while (1);
@@ -185,6 +186,7 @@ void Ssh2LocalPortForwarding::onReadyReadServer()
             break;
         }
         forwardSocket_->write(buffer.data(), readBytes);
+        forwardSocket_->flush();
     } while (1);
 }
 
