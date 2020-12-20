@@ -31,10 +31,6 @@ using namespace daggyssh2;
 
 Ssh2Channel::Ssh2Channel(Ssh2Client* ssh2_client)
     : QIODevice(ssh2_client)
-    , ssh2_channel_state_(ChannelStates::NotOpen)
-    , ssh2_channel_(nullptr)
-    , exit_status_(-1)
-    , exit_signal_("none")
     , last_error_(ssh2_success)
 {
 }
@@ -94,7 +90,7 @@ bool Ssh2Channel::open(QIODevice::OpenMode)
     if (ssh2Client()->sessionState() != Ssh2Client::Established)
         return false;
 
-    std::error_code error_code = openSession();
+    std::error_code error_code = openChannelSession();
     setLastError(error_code);
     return checkSsh2Error(error_code);
 }
@@ -105,8 +101,7 @@ void Ssh2Channel::close()
         return;
     if (ssh2_channel_state_ == Opened) {
         emit aboutToClose();
-        //libssh2_channel_send_eof(ssh2_channel_);
-        std::error_code error_code = closeSession();
+        std::error_code error_code = closeChannelSession();
         setLastError(error_code);
     } else
         destroyChannel();
@@ -133,7 +128,7 @@ void Ssh2Channel::checkIncomingData()
     std::error_code error_code = ssh2_success;
     switch (ssh2_channel_state_) {
     case ChannelStates::Opening:
-        error_code = openSession();
+        error_code = openChannelSession();
         break;
     case ChannelStates::Opened:
         checkChannelData();
@@ -143,7 +138,7 @@ void Ssh2Channel::checkIncomingData()
         break;
     case ChannelStates::Closing:
         checkChannelData();
-        error_code = closeSession();
+        error_code = closeChannelSession();
         break;
     default:;
     }
@@ -169,7 +164,7 @@ void Ssh2Channel::setSsh2ChannelState(const ChannelStates& state)
     }
 }
 
-std::error_code Ssh2Channel::openSession()
+std::error_code Ssh2Channel::openChannelSession()
 {
     std::error_code error_code = ssh2_success;
     int ssh2_method_result = 0;
@@ -200,7 +195,7 @@ std::error_code Ssh2Channel::openSession()
     return error_code;
 }
 
-std::error_code Ssh2Channel::closeSession()
+std::error_code Ssh2Channel::closeChannelSession()
 {
     std::error_code error_code = ssh2_success;
     libssh2_channel_flush_ex(ssh2_channel_, 0);

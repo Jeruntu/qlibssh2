@@ -71,6 +71,10 @@ public:
             return "Tcp connection error";
         case TcpConnectionRefused:
             return "Tcp connection refused";
+        case ScpReadFileError:
+            return "Can't open file for reading";
+        case ScpWriteFileError:
+            return "Can't open file for writing";
         case TryAgain:
             return "Try again";
         default:

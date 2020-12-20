@@ -72,6 +72,8 @@ public:
 
     QString exitSignal() const;
 
+    std::error_code lastError() const { return last_error_; }
+
 signals:
     void ssh2Error(std::error_code ssh2_error);
 
@@ -83,20 +85,20 @@ protected:
     Ssh2Channel(Ssh2Client* ssh2_client);
 
     std::error_code setLastError(const std::error_code& error_code);
+    void setSsh2ChannelState(const ChannelStates& state);
+    virtual std::error_code openChannelSession();
+    virtual std::error_code closeChannelSession();
+    LIBSSH2_CHANNEL* ssh2_channel_{nullptr};
 
 private:
-    void setSsh2ChannelState(const ChannelStates& state);
-    std::error_code openSession();
-    std::error_code closeSession();
     void destroyChannel();
     void checkChannelData(const ChannelStream& stream_id);
-
-    ChannelStates ssh2_channel_state_;
-    LIBSSH2_CHANNEL* ssh2_channel_;
-    int exit_status_;
-    QString exit_signal_;
-    std::error_code last_error_;
     void checkChannelData();
+
+    ChannelStates ssh2_channel_state_{ChannelStates::NotOpen};
+    int exit_status_{-1};
+    QString exit_signal_{"none"};
+    std::error_code last_error_;
 };
 
 } // namespace daggyssh2

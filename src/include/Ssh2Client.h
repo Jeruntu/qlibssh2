@@ -32,6 +32,7 @@ namespace daggyssh2
 {
 class Ssh2Process;
 class Ssh2Channel;
+class Ssh2Scp;
 
 class Ssh2Client final : public QTcpSocket
 {
@@ -72,6 +73,8 @@ public:
     LIBSSH2_SESSION* ssh2Session() const;
 
     QPointer<Ssh2Process> createProcess(const QString& command);
+    QPointer<Ssh2Scp> scpSend(const QString& localFilePath, const QString &destinationPath);
+    QPointer<Ssh2Scp> scpReceive(const QString& remoteFilePath, const QString &destinationPath);
 
     int channelsCount() const;
     int openChannelsCount() const;

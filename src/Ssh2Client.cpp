@@ -25,6 +25,7 @@ SOFTWARE.
 #include "Ssh2Channel.h"
 #include "Ssh2Debug.h"
 #include "Ssh2Process.h"
+#include "Ssh2Scp.h"
 
 #include <libssh2.h>
 
@@ -211,7 +212,7 @@ void Ssh2Client::onReadyRead()
     case SessionStates::Authentication:
         error_code = authenticate();
         break;
-    case SessionStates::Established:
+    case SessionStates::Established: [[fallthrough]];
     case SessionStates::Closing:
         for (Ssh2Channel* ssh2_channel : getChannels()) {
             ssh2_channel->checkIncomingData();
@@ -470,6 +471,20 @@ QPointer<Ssh2Process> Ssh2Client::createProcess(const QString& command)
     return ssh2_process;
 }
 
+QPointer<Ssh2Scp> Ssh2Client::scpSend(const QString &localFilePath, const QString &destinationPath)
+{
+    auto* ssh2_scp = new Ssh2Scp(localFilePath, destinationPath, Ssh2Scp::Send, this);
+    addChannel(ssh2_scp);
+    return ssh2_scp;
+}
+
+QPointer<Ssh2Scp> Ssh2Client::scpReceive(const QString &remoteFilePath, const QString &destinationPath)
+{
+    auto* ssh2_scp = new Ssh2Scp(remoteFilePath, destinationPath, Ssh2Scp::Receive, this);
+    addChannel(ssh2_scp);
+    return ssh2_scp;
+}
+
 int Ssh2Client::channelsCount() const
 {
     return getChannels().size();
@@ -540,8 +555,8 @@ void Ssh2Client::setSsh2SessionState(const Ssh2Client::SessionStates& new_state)
         case Closing:
             closeChannels();
             break;
-        case FailedToEstablish:
-        case Closed:
+        case FailedToEstablish: [[fallthrough]];
+        case Closed: [[fallthrough]];
         case Aborted:
             destroySsh2Objects();
             break;

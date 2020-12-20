@@ -78,7 +78,9 @@ enum Ssh2Error {
     TryAgain,
     ConnectionTimeoutError,
     TcpConnectionError,
-    TcpConnectionRefused
+    TcpConnectionRefused,
+    ScpReadFileError,
+    ScpWriteFileError
 };
 
 std::error_code make_error_code(Ssh2Error ssh2_error);
