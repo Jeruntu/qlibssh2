@@ -60,11 +60,13 @@ struct Ssh2Settings {
 
 enum Ssh2Error {
     ErrorReadKnownHosts = 1,
+    ErrorWriteKnownHosts,
     SessionStartupError,
     UnexpectedError,
     HostKeyInvalidError,
     HostKeyMismatchError,
     HostKeyUnknownError,
+    HostKeyAppendError,
     AuthenticationError,
     FailedToOpenChannel,
     FailedToCloseChannel,

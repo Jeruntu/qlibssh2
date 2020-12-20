@@ -144,6 +144,8 @@ void Ssh2Client::disconnectFromHost()
         break;
     default:;
     }
+
+    QAbstractSocket::disconnectFromHost();
 }
 
 void Ssh2Client::onTcpConnected()
@@ -332,7 +334,7 @@ std::error_code Ssh2Client::checkKnownHosts() const
         struct libssh2_knownhost* host = nullptr;
         const int check = libssh2_knownhost_check(known_hosts_,
                                                   qPrintable(peerAddress().toString()),
-                                                  (char *)fingerprint,
+                                                  fingerprint,
                                                   length,
                                                   LIBSSH2_KNOWNHOST_TYPE_PLAIN |
                                                   LIBSSH2_KNOWNHOST_KEYENC_RAW,
@@ -484,6 +486,54 @@ int Ssh2Client::openChannelsCount() const
             result++;
     }
     return result;
+}
+
+std::error_code Ssh2Client::appendToKnownHosts(const QLatin1String& comment) const
+{
+    size_t hostKeyLength{0};
+    int hostKeyType{0};
+    auto* hostKey = libssh2_session_hostkey(ssh2_session_, &hostKeyLength, &hostKeyType);
+    if (!hostKey)
+        return Ssh2Error::HostKeyInvalidError;
+
+    int knownHostKeyType{0};
+    switch (hostKeyType) {
+    case LIBSSH2_HOSTKEY_TYPE_UNKNOWN:
+        return Ssh2Error::HostKeyUnknownError;
+    case LIBSSH2_HOSTKEY_TYPE_RSA:
+        knownHostKeyType = LIBSSH2_KNOWNHOST_KEY_RSA1;
+        break;
+    case LIBSSH2_HOSTKEY_TYPE_DSS:
+        knownHostKeyType = LIBSSH2_KNOWNHOST_KEY_SSHDSS;
+        break;
+    case LIBSSH2_HOSTKEY_TYPE_ECDSA_256:
+        knownHostKeyType = LIBSSH2_KNOWNHOST_KEY_ECDSA_256;
+        break;
+    case LIBSSH2_HOSTKEY_TYPE_ECDSA_384:
+        knownHostKeyType = LIBSSH2_KNOWNHOST_KEY_ECDSA_384;
+        break;
+    case LIBSSH2_HOSTKEY_TYPE_ECDSA_521:
+        knownHostKeyType = LIBSSH2_KNOWNHOST_KEY_ECDSA_521;
+        break;
+    case LIBSSH2_HOSTKEY_TYPE_ED25519:
+        knownHostKeyType = LIBSSH2_KNOWNHOST_KEY_ED25519;
+        break;
+    }
+
+    if (libssh2_knownhost_addc(known_hosts_, peerName().toLocal8Bit().data(), nullptr,
+                               hostKey, hostKeyLength,
+                               comment.data(), comment.size(),
+                               LIBSSH2_KNOWNHOST_TYPE_PLAIN | LIBSSH2_KNOWNHOST_KEYENC_RAW | knownHostKeyType,
+                               nullptr)) {
+        return Ssh2Error::HostKeyAppendError;
+    }
+
+    if (libssh2_knownhost_writefile(known_hosts_, ssh2_settings_.known_hosts.toLatin1().data(),
+                                    LIBSSH2_KNOWNHOST_FILE_OPENSSH)) {
+        return Ssh2Error::ErrorWriteKnownHosts;
+    }
+
+    return ssh2_success;
 }
 
 void Ssh2Client::setSsh2SessionState(const Ssh2Client::SessionStates& new_state)

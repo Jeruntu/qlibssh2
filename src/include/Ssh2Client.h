@@ -77,6 +77,8 @@ public:
     int channelsCount() const;
     int openChannelsCount() const;
 
+    std::error_code appendToKnownHosts(const QLatin1String& comment) const;
+
 signals:
     void sessionStateChanged(SessionStates ssh2_state);
     void ssh2Error(std::error_code ssh2_error);
