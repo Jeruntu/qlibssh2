@@ -77,6 +77,13 @@ void Ssh2LocalPortForwarding::checkIncomingData()
     setLastError(error_code);
 }
 
+void Ssh2LocalPortForwarding::close()
+{
+    tcpServer_.close();
+    forwardState_ = ForwardState::NotOpen;
+    Ssh2Channel::close();
+}
+
 std::error_code Ssh2LocalPortForwarding::startListening()
 {
     if (!tcpServer_.listen(QHostAddress{localListenIp_}, localListenPort_)) {
@@ -120,7 +127,7 @@ std::error_code Ssh2LocalPortForwarding::openChannelSession()
         connect(forwardSocket_, &QTcpSocket::readyRead,
                 this, &Ssh2LocalPortForwarding::onReadyReadForward);
         connect(forwardSocket_, &QTcpSocket::disconnected,
-                this, &Ssh2LocalPortForwarding::close);
+                this, &Ssh2LocalPortForwarding::closeChannelSession);
         break;
     default: {
         debugSsh2Error(ssh2_method_result);

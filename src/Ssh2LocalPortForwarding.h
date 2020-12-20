@@ -29,7 +29,7 @@ protected:
                             const QHostAddress& remoteListenIp, qint16 remoteListenPort,
                             Ssh2Client* ssh2_client);
     void checkIncomingData() override;
-
+    void close() override;
 
 private:
     friend class Ssh2Client;
