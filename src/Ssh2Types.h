@@ -54,7 +54,8 @@ struct Ssh2Settings {
     QString keyphrase;
     QString known_hosts = defaultKnownHosts();
     unsigned int timeout = 1000;
-
+    bool autoAppendToKnownHosts = false;
+    QLatin1String autoAppendKnownHostComment;
     bool isPasswordAuth() const;
     bool isKeyAuth() const;
 };

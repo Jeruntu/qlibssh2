@@ -351,7 +351,11 @@ std::error_code Ssh2Client::checkKnownHosts() const
             result = Ssh2Error::HostKeyMismatchError;
             break;
         case LIBSSH2_KNOWNHOST_CHECK_NOTFOUND:
-            result = Ssh2Error::HostKeyUnknownError;
+            if (ssh2_settings_.autoAppendToKnownHosts) {
+                result = appendToKnownHosts(ssh2_settings_.autoAppendKnownHostComment);
+            } else {
+                result = Ssh2Error::HostKeyUnknownError;
+            }
             break;
         }
     }
