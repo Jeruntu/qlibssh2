@@ -161,7 +161,8 @@ Ssh2Channel::ChannelStates Ssh2Channel::channelState() const
     return ssh2_channel_state_;
 }
 
-void Ssh2Channel::setSsh2ChannelState(const ChannelStates& state) {
+void Ssh2Channel::setSsh2ChannelState(const ChannelStates& state)
+{
     if (ssh2_channel_state_ != state) {
         ssh2_channel_state_ = state;
         emit channelStateChanged(ssh2_channel_state_);
@@ -223,8 +224,7 @@ std::error_code Ssh2Channel::closeSession()
         if (result == 0)
             exit_signal_ = QString(exit_signal);
         destroyChannel();
-    }
-        break;
+    } break;
     default: {
         debugSsh2Error(ssh2_method_result);
         destroyChannel();

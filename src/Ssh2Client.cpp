@@ -23,8 +23,8 @@ SOFTWARE.
 */
 #include "Ssh2Client.h"
 #include "Ssh2Channel.h"
-#include "Ssh2Process.h"
 #include "Ssh2Debug.h"
+#include "Ssh2Process.h"
 
 #include <libssh2.h>
 
@@ -33,46 +33,51 @@ SOFTWARE.
 
 using namespace daggyssh2;
 
-namespace  {
+namespace
+{
 
 std::atomic<size_t> ssh2_initializations_count(0);
 
-void initializeSsh2() {
+void initializeSsh2()
+{
     if (ssh2_initializations_count == 0)
         libssh2_init(0);
     ssh2_initializations_count++;
 };
 
-void freeSsh2() {
+void freeSsh2()
+{
     if (ssh2_initializations_count == 1)
         libssh2_exit();
     if (ssh2_initializations_count > 0)
         ssh2_initializations_count--;
 };
 
-ssize_t libssh_recv(int socket,void *buffer, size_t length,int flags, void **abstract){
+ssize_t libssh_recv(int socket, void* buffer, size_t length, int flags, void** abstract)
+{
     Q_UNUSED(socket);
     Q_UNUSED(flags);
     QTcpSocket* const tcp_socket = reinterpret_cast<QTcpSocket*>(*abstract);
     char* const data = reinterpret_cast<char*>(buffer);
     ssize_t result = tcp_socket->read(data, length);
-    if(result == 0)
+    if (result == 0)
         result = -EAGAIN;
     return result;
 }
 
-ssize_t libssh_send(int socket, const void *buffer, size_t length, int flags, void **abstract){
+ssize_t libssh_send(int socket, const void* buffer, size_t length, int flags, void** abstract)
+{
     Q_UNUSED(socket);
     Q_UNUSED(flags);
     QTcpSocket* const tcp_socket = reinterpret_cast<QTcpSocket*>(*abstract);
     const char* const data = reinterpret_cast<const char*>(buffer);
     ssize_t result = tcp_socket->write(data, length);
-    if(result == 0)
+    if (result == 0)
         result = -EAGAIN;
     return result;
 }
 
-}
+} // namespace
 
 Ssh2Client::Ssh2Client(Ssh2Settings ssh2_settings,
                        QObject* parent)
@@ -130,15 +135,13 @@ void Ssh2Client::disconnectFromHost()
     if (state() == QAbstractSocket::UnconnectedState)
         return;
     switch (ssh2_state_) {
-    case Established:
-    {
+    case Established: {
         if (openChannelsCount() > 0) {
             setSsh2SessionState(Closing);
         } else {
             setSsh2SessionState(Closed);
         }
-    }
-        break;
+    } break;
     case Closing:
         destroySsh2Objects();
         break;
@@ -217,9 +220,7 @@ void Ssh2Client::onReadyRead()
     default:;
     }
 
-    if (ssh2_state_ != SessionStates::Established &&
-        !checkSsh2Error(error_code))
-    {
+    if (ssh2_state_ != SessionStates::Established && !checkSsh2Error(error_code)) {
         setSsh2SessionState(SessionStates::FailedToEstablish, error_code);
     }
 }
@@ -258,7 +259,7 @@ void Ssh2Client::addChannel(Ssh2Channel* channel)
     disconnect(channel);
     emit channelsCountChanged(channelsCount());
     connect(channel, &Ssh2Channel::channelStateChanged, this, &Ssh2Client::onChannelStateChanged);
-    connect(channel, &Ssh2Channel::destroyed, [this](QObject*){
+    connect(channel, &Ssh2Channel::destroyed, [this](QObject*) {
         emit channelsCountChanged(channelsCount());
     });
 }
@@ -307,9 +308,9 @@ std::error_code Ssh2Client::createSsh2Objects()
 
     if (ssh2_settings_.isKeyAuth()) {
         const int ssh2_method_result = libssh2_knownhost_readfile(
-                    known_hosts_,
-                    qPrintable(ssh2_settings_.known_hosts),
-                    LIBSSH2_KNOWNHOST_FILE_OPENSSH);
+            known_hosts_,
+            qPrintable(ssh2_settings_.known_hosts),
+            LIBSSH2_KNOWNHOST_FILE_OPENSSH);
         if (ssh2_method_result < 0)
             return Ssh2Error::ErrorReadKnownHosts;
     }
@@ -330,17 +331,16 @@ std::error_code Ssh2Client::checkKnownHosts() const
         return Ssh2Error::HostKeyInvalidError;
 
     std::error_code result = ssh2_success;
-    if(fingerprint) {
+    if (fingerprint) {
         struct libssh2_knownhost* host = nullptr;
         const int check = libssh2_knownhost_check(known_hosts_,
                                                   qPrintable(peerAddress().toString()),
                                                   fingerprint,
                                                   length,
-                                                  LIBSSH2_KNOWNHOST_TYPE_PLAIN |
-                                                  LIBSSH2_KNOWNHOST_KEYENC_RAW,
+                                                  LIBSSH2_KNOWNHOST_TYPE_PLAIN | LIBSSH2_KNOWNHOST_KEYENC_RAW,
                                                   &host);
 
-        switch(check){
+        switch (check) {
         case LIBSSH2_KNOWNHOST_CHECK_MATCH:
             result = ssh2_success;
             break;
@@ -374,18 +374,16 @@ std::error_code Ssh2Client::getAvailableAuthMethods()
     }
 
     if (available_list != nullptr) {
-        foreach(QByteArray method, QByteArray(available_list).split(','))
-        {
-            if (method == "publickey"){
+        foreach (QByteArray method, QByteArray(available_list).split(',')) {
+            if (method == "publickey") {
                 ssh2_available_auth_methods_ << Ssh2AuthMethods::PublicKeyAuthentication;
-            }
-            else if(method == "password"){
+            } else if (method == "password") {
                 ssh2_available_auth_methods_ << Ssh2AuthMethods::PasswordAuthentication;
             }
         }
         ssh2_auth_method_ = getAuthenticationMethod(ssh2_available_auth_methods_);
         result = authenticate();
-    } else if(ssh2_method_result != 0) {
+    } else if (ssh2_method_result != 0) {
         result = Ssh2Error::UnexpectedError;
         debugSsh2Error(ssh2_method_result);
     }
@@ -397,13 +395,9 @@ Ssh2Client::Ssh2AuthMethods Ssh2Client::getAuthenticationMethod(const QList<Ssh2
     Ssh2AuthMethods result = Ssh2AuthMethods::NoAuth;
     if (available_auth_methods.isEmpty())
         result = Ssh2AuthMethods::NoAuth;
-    else if(available_auth_methods.contains(Ssh2AuthMethods::PasswordAuthentication) &&
-            ssh2_settings_.isPasswordAuth())
-    {
+    else if (available_auth_methods.contains(Ssh2AuthMethods::PasswordAuthentication) && ssh2_settings_.isPasswordAuth()) {
         result = Ssh2AuthMethods::PasswordAuthentication;
-    } else if(available_auth_methods.contains(Ssh2AuthMethods::PublicKeyAuthentication) &&
-              ssh2_settings_.isKeyAuth())
-    {
+    } else if (available_auth_methods.contains(Ssh2AuthMethods::PublicKeyAuthentication) && ssh2_settings_.isKeyAuth()) {
         result = Ssh2AuthMethods::PublicKeyAuthentication;
     }
 
@@ -420,17 +414,17 @@ std::error_code Ssh2Client::authenticate()
         break;
     case Ssh2AuthMethods::PublicKeyAuthentication:
         ssh2_method_result = libssh2_userauth_publickey_fromfile(
-                    ssh2_session_,
-                    qPrintable(ssh2_settings_.user),
-                    nullptr,
-                    qPrintable(ssh2_settings_.key),
-                    qPrintable(ssh2_settings_.keyphrase));
+            ssh2_session_,
+            qPrintable(ssh2_settings_.user),
+            nullptr,
+            qPrintable(ssh2_settings_.key),
+            qPrintable(ssh2_settings_.keyphrase));
         break;
     case Ssh2AuthMethods::PasswordAuthentication:
         ssh2_method_result = libssh2_userauth_password(
-                    ssh2_session_,
-                    qPrintable(ssh2_settings_.user),
-                    qPrintable(ssh2_settings_.passphrase));
+            ssh2_session_,
+            qPrintable(ssh2_settings_.user),
+            qPrintable(ssh2_settings_.passphrase));
         break;
     }
     switch (ssh2_method_result) {
@@ -442,8 +436,7 @@ std::error_code Ssh2Client::authenticate()
         result = ssh2_success;
         setSsh2SessionState(SessionStates::Established);
         break;
-    default:
-    {
+    default: {
         debugSsh2Error(ssh2_method_result);
         result = Ssh2Error::AuthenticationError;
     }

@@ -27,7 +27,8 @@ SOFTWARE.
 
 #include "Ssh2Channel.h"
 
-namespace daggyssh2 {
+namespace daggyssh2
+{
 
 class Ssh2Process : public Ssh2Channel
 {
@@ -43,7 +44,6 @@ public:
         Finishing,
         Finished
     };
-
 
     ProcessStates processState() const;
     void checkIncomingData() override;
@@ -68,4 +68,4 @@ private:
     friend class Ssh2Client;
 };
 
-}
+} // namespace daggyssh2

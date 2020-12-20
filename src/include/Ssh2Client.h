@@ -22,13 +22,14 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #pragma once
-#include <QTcpSocket>
 #include <QList>
 #include <QPointer>
+#include <QTcpSocket>
 
 #include "Ssh2Types.h"
 
-namespace daggyssh2 {
+namespace daggyssh2
+{
 class Ssh2Process;
 class Ssh2Channel;
 
@@ -128,4 +129,4 @@ private:
     LIBSSH2_SESSION* ssh2_session_;
     LIBSSH2_KNOWNHOSTS* known_hosts_;
 };
-}
+} // namespace daggyssh2

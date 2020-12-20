@@ -23,8 +23,8 @@ SOFTWARE.
 */
 #pragma once
 
-#include <QString>
 #include <QMetaType>
+#include <QString>
 
 #include <system_error>
 
@@ -37,7 +37,8 @@ typedef struct _LIBSSH2_CHANNEL LIBSSH2_CHANNEL;
 struct _LIBSSH2_KNOWNHOSTS;
 typedef struct _LIBSSH2_KNOWNHOSTS LIBSSH2_KNOWNHOSTS;
 
-namespace daggyssh2 {
+namespace daggyssh2
+{
 
 extern const std::error_code ssh2_success;
 
@@ -80,13 +81,13 @@ enum Ssh2Error {
 };
 
 std::error_code make_error_code(Ssh2Error ssh2_error);
-}
+} // namespace daggyssh2
 
 Q_DECLARE_METATYPE(daggyssh2::Ssh2Settings)
 
 namespace std
 {
 template <>
-struct is_error_code_enum<daggyssh2::Ssh2Error> : true_type {};
-}
-
+struct is_error_code_enum<daggyssh2::Ssh2Error> : true_type {
+};
+} // namespace std

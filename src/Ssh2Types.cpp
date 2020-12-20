@@ -29,7 +29,8 @@ using namespace daggyssh2;
 
 const std::error_code daggyssh2::ssh2_success = std::error_code{};
 
-namespace  {
+namespace
+{
 class Ssh2ErrorCategory : public std::error_category
 {
 public:
@@ -37,31 +38,49 @@ public:
     {
         return "Ssh2Errors";
     };
-    std::string message(int ev) const override {
+    std::string message(int ev) const override
+    {
         switch (static_cast<Ssh2Error>(ev)) {
-        case ErrorReadKnownHosts: return "Error in read known hosts file";
-        case ErrorWriteKnownHosts: return "Error in writing to known hosts file";
-        case SessionStartupError: return "Ssh2 session startup error";
-        case UnexpectedError: return "Unexpected shutdown error";
-        case HostKeyInvalidError: return "Host key invalid error";
-        case HostKeyMismatchError: return "Host key mismatch error";
-        case HostKeyUnknownError: return "Host key unknown error";
-        case HostKeyAppendError: return "Host key append error";
-        case AuthenticationError: return "Authentication error";
-        case FailedToOpenChannel: return "Failed to open channel";
-        case FailedToCloseChannel: return "Failed to close channel";
-        case ProcessFailedToStart: return "Process failed to start";
-        case ConnectionTimeoutError: return "Connection timeout error";
-        case TcpConnectionError: return "Tcp connection error";
-        case TcpConnectionRefused: return "Tcp connection refused";
-        case TryAgain: return "Try again";
-        default: return "Unknown error";
+        case ErrorReadKnownHosts:
+            return "Error in read known hosts file";
+        case ErrorWriteKnownHosts:
+            return "Error in writing to known hosts file";
+        case SessionStartupError:
+            return "Ssh2 session startup error";
+        case UnexpectedError:
+            return "Unexpected shutdown error";
+        case HostKeyInvalidError:
+            return "Host key invalid error";
+        case HostKeyMismatchError:
+            return "Host key mismatch error";
+        case HostKeyUnknownError:
+            return "Host key unknown error";
+        case HostKeyAppendError:
+            return "Host key append error";
+        case AuthenticationError:
+            return "Authentication error";
+        case FailedToOpenChannel:
+            return "Failed to open channel";
+        case FailedToCloseChannel:
+            return "Failed to close channel";
+        case ProcessFailedToStart:
+            return "Process failed to start";
+        case ConnectionTimeoutError:
+            return "Connection timeout error";
+        case TcpConnectionError:
+            return "Tcp connection error";
+        case TcpConnectionRefused:
+            return "Tcp connection refused";
+        case TryAgain:
+            return "Try again";
+        default:
+            return "Unknown error";
         }
     };
 
 } ssh2_error_category;
 
-}
+} // namespace
 
 std::error_code daggyssh2::make_error_code(Ssh2Error ssh2_error)
 {
