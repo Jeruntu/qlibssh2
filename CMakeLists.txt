@@ -20,12 +20,21 @@ add_library(qlibssh2 STATIC
     src/Ssh2Types.cpp
     src/Ssh2Scp.cpp
     src/Ssh2LocalPortForwarding.cpp
+
+    # For automoc
+    src/include/Ssh2Client.h
+    src/include/Ssh2LocalPortForwarding.h
+    src/include/Ssh2Process.h
+    src/include/Ssh2Scp.h
+    src/include/Ssh2Types.h
 )
 
 target_include_directories(qlibssh2
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src/include>
         $<INSTALL_INTERFACE:include>
+    PRIVATE
+        src
 )
 
 target_link_libraries(qlibssh2
