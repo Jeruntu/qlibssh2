@@ -5,7 +5,7 @@ from conans import ConanFile, CMake, tools
 
 class Qlibssh2TestConan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
-    generators = "cmake_paths"
+    generators = "cmake_paths", "cmake_find_package"
 
     def build(self):
         cmake = CMake(self)

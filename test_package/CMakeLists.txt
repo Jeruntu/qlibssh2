@@ -2,13 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 
 project(PackageTest CXX)
 
-find_package(Libssh2 REQUIRED CONFIG)
-find_package(Qt5 REQUIRED
-    Core
-    Network
-)
-
-find_package(QLibssh2 REQUIRED)
+find_package(QLibssh2 REQUIRED CONFIG)
 
 add_executable(example example.cpp)
 

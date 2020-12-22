@@ -46,16 +46,36 @@ target_link_libraries(qlibssh2
 
 target_compile_features(qlibssh2 PUBLIC cxx_std_17)
 
+# --- Create installed package
+include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
 set(PACKAGE_NAME ${CMAKE_PROJECT_NAME})
+
+set(TARGETS_FILE ${CMAKE_INSTALL_LIBDIR}/cmake/${PACKAGE_NAME}/${PACKAGE_NAME}Targets.cmake)
+configure_package_config_file(
+    cmake/${PACKAGE_NAME}Config.cmake.in
+    ${CMAKE_BINARY_DIR}/${PACKAGE_NAME}Config.cmake
+    INSTALL_DESTINATION
+        ${CMAKE_INSTALL_LIBDIR}/cmake/${PACKAGE_NAME}
+    PATH_VARS
+        TARGETS_FILE
+)
+
+get_filename_component(TARGETS_FILE_WLE ${TARGETS_FILE} NAME_WLE)
 install(TARGETS qlibssh2
-    EXPORT ${PACKAGE_NAME}Config
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    )
-install(DIRECTORY src/include/
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PACKAGE_NAME}
-    )
-install(EXPORT ${PACKAGE_NAME}Config
+    EXPORT ${TARGETS_FILE_WLE}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+install(EXPORT ${TARGETS_FILE_WLE}
     NAMESPACE QLIBSSH2::
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PACKAGE_NAME}
-    )
+)
+install(
+    FILES
+        ${CMAKE_BINARY_DIR}/${PACKAGE_NAME}Config.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PACKAGE_NAME}
+)
+install(DIRECTORY src/include/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PACKAGE_NAME}
+)
+

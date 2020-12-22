@@ -12,14 +12,17 @@ class Qlibssh2Conan(ConanFile):
     settings = "os", "compiler", "build_type", "arch"
     options = {}
     default_options = {}
-    generators = "cmake"
-    requires = ["libssh2/[>=1.9.0]",
-                # "qt/5.15.2@bincrafters/stable",
-                "openssl/1.1.1g"]
-
-    def export_sources(self):
-        self.copy("src/*")
-        self.copy("CMakeLists.txt")
+    generators = "cmake_paths", "cmake_find_package"
+    requires = [
+        "libssh2/[>=1.9.0]",
+        "openssl/1.1.1g"
+        # "qt/5.15.2@bincrafters/stable",
+    ]
+    exports_sources = [
+        "src/*",
+        "CMakeLists.txt",
+        "cmake/QLibssh2Config.cmake.in"
+    ]
 
     def config_options(self):
         pass
@@ -52,17 +55,13 @@ class Qlibssh2Conan(ConanFile):
 
         self.options["libssh2"].shared = False
 
-    def _configure_cmake(self):
+    def build(self):
         cmake = CMake(self)
         cmake.configure()
-        return cmake
-
-    def build(self):
-        cmake = self._configure_cmake()
         cmake.build()
 
     def package(self):
-        cmake = self._configure_cmake()
+        cmake = CMake(self)
         cmake.install()
 
     def package_info(self):

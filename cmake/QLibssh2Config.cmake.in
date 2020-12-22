@@ -1,0 +1,12 @@
+@PACKAGE_INIT@
+
+set_and_check(TARGETS_FILE "@PACKAGE_TARGETS_FILE@")
+
+check_required_components(QLibssh2)
+
+include(CMakeFindDependencyMacro)
+find_dependency(Libssh2)
+find_dependency(Qt5Core)
+find_dependency(Qt5Network)
+
+include("${TARGETS_FILE}")
