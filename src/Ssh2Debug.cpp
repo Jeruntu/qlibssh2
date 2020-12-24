@@ -26,14 +26,14 @@ SOFTWARE.
 
 #include <QtCore/QDebug>
 
-using namespace daggyssh2;
+using namespace qlibssh2;
 
-bool daggyssh2::checkSsh2Error(const std::error_code& error_code)
+bool qlibssh2::checkSsh2Error(const std::error_code& error_code)
 {
     return error_code == ssh2_success || error_code == Ssh2Error::TryAgain;
 }
 
-void daggyssh2::debugSsh2Error(const int ssh2_method_result)
+void qlibssh2::debugSsh2Error(const int ssh2_method_result)
 {
     qDebug() << "Ssh2 error: " << ssh2_method_result;
 }

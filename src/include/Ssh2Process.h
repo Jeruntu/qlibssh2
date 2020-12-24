@@ -27,7 +27,7 @@ SOFTWARE.
 
 #include "Ssh2Channel.h"
 
-namespace daggyssh2
+namespace qlibssh2
 {
 
 class Ssh2Process : public Ssh2Channel
@@ -68,4 +68,4 @@ private:
     friend class Ssh2Client;
 };
 
-} // namespace daggyssh2
+} // namespace qlibssh2

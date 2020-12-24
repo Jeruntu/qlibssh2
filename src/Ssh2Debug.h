@@ -25,10 +25,10 @@ SOFTWARE.
 
 #include <system_error>
 
-namespace daggyssh2
+namespace qlibssh2
 {
 
 void debugSsh2Error(const int ssh2_method_result);
 bool checkSsh2Error(const std::error_code& error_code);
 
-} // namespace daggyssh2
+} // namespace qlibssh2

@@ -8,7 +8,7 @@
 
 class QTcpSocket;
 
-namespace daggyssh2
+namespace qlibssh2
 {
 
 class Ssh2LocalPortForwarding : public Ssh2Channel
@@ -50,6 +50,6 @@ private:
     QPointer<QTcpSocket> forwardSocket_;
 };
 
-} // namespace daggyssh2
+} // namespace qlibssh2
 
 #endif // SSH2LOCALPORTFORWARDING_H

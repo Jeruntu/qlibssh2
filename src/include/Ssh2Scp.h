@@ -11,7 +11,7 @@
 
 class QFile;
 
-namespace daggyssh2
+namespace qlibssh2
 {
 
 class Ssh2Scp : public Ssh2Channel
@@ -63,6 +63,6 @@ private:
     qint64 totalReadBytes_{0};
 };
 
-} // namespace daggyssh2
+} // namespace qlibssh2
 
 #endif // SSH2SCP_H

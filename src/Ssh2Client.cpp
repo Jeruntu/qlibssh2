@@ -33,7 +33,7 @@ SOFTWARE.
 #include <QtCore/QTimer>
 #include <QtNetwork/QHostAddress>
 
-using namespace daggyssh2;
+using namespace qlibssh2;
 
 namespace
 {

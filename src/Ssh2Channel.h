@@ -27,7 +27,7 @@ SOFTWARE.
 
 #include "Ssh2Types.h"
 
-namespace daggyssh2
+namespace qlibssh2
 {
 class Ssh2Client;
 
@@ -101,4 +101,4 @@ private:
     std::error_code last_error_;
 };
 
-} // namespace daggyssh2
+} // namespace qlibssh2

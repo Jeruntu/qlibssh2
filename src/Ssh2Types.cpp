@@ -25,9 +25,9 @@ SOFTWARE.
 
 #include <QtCore/QStandardPaths>
 
-using namespace daggyssh2;
+using namespace qlibssh2;
 
-const std::error_code daggyssh2::ssh2_success = std::error_code{};
+const std::error_code qlibssh2::ssh2_success = std::error_code{};
 
 namespace
 {
@@ -86,22 +86,22 @@ public:
 
 } // namespace
 
-std::error_code daggyssh2::make_error_code(Ssh2Error ssh2_error)
+std::error_code qlibssh2::make_error_code(Ssh2Error ssh2_error)
 {
     return std::error_code(static_cast<int>(ssh2_error), ssh2_error_category);
 }
 
-QString daggyssh2::defaultUser()
+QString qlibssh2::defaultUser()
 {
     return QString::fromLocal8Bit(qgetenv("USER"));
 }
 
-QString daggyssh2::defaultKey()
+QString qlibssh2::defaultKey()
 {
     return QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/.ssh/id_rsa";
 }
 
-QString daggyssh2::defaultKnownHosts()
+QString qlibssh2::defaultKnownHosts()
 {
     return QStandardPaths::writableLocation(QStandardPaths::HomeLocation) + "/.ssh/known_hosts";
 }

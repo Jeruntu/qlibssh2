@@ -32,7 +32,7 @@ SOFTWARE.
 #include <QtCore/QFile>
 #include <QtCore/QFileInfo>
 
-using namespace daggyssh2;
+using namespace qlibssh2;
 
 Ssh2Scp::~Ssh2Scp()
 {

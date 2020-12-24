@@ -28,7 +28,7 @@ SOFTWARE.
 
 #include "Ssh2Types.h"
 
-namespace daggyssh2
+namespace qlibssh2
 {
 class Ssh2Process;
 class Ssh2Channel;
@@ -140,4 +140,4 @@ private:
     LIBSSH2_SESSION* ssh2_session_;
     LIBSSH2_KNOWNHOSTS* known_hosts_;
 };
-} // namespace daggyssh2
+} // namespace qlibssh2

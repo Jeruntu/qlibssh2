@@ -28,7 +28,7 @@ SOFTWARE.
 
 #include <libssh2.h>
 
-using namespace daggyssh2;
+using namespace qlibssh2;
 
 Ssh2LocalPortForwarding::Ssh2LocalPortForwarding(const QHostAddress& localListenIp, qint16 localListenPort,
                                                  const QHostAddress& remoteListenIp, qint16 remoteListenPort,

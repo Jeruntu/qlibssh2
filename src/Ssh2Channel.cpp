@@ -27,7 +27,7 @@ SOFTWARE.
 
 #include <libssh2.h>
 
-using namespace daggyssh2;
+using namespace qlibssh2;
 
 Ssh2Channel::Ssh2Channel(Ssh2Client* ssh2_client)
     : QIODevice(ssh2_client)

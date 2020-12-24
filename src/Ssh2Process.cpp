@@ -27,7 +27,7 @@ SOFTWARE.
 
 #include <libssh2.h>
 
-using namespace daggyssh2;
+using namespace qlibssh2;
 
 Ssh2Process::Ssh2Process(const QString& command, Ssh2Client* ssh2_client)
     : Ssh2Channel(ssh2_client)
