@@ -33,7 +33,7 @@ Qt5Network. The libssh2 library has dependencies on OpenSSL and zlib.
 ### API
 
 ```cpp
-using namespace daggy;
+using namespace qlibssh2;
 int main() {
     Ssh2Client client{{}};
     # TODO add api logic here
@@ -91,11 +91,11 @@ PS choco install openssl
 Make sure the OpenSSL dll's are in the PATH. Build libssh2:
 
 ```powershell
-git clone https://github.com/libssh2/libssh2.git
-cd libssh2
-md build; cd build
-cmake .. -DBUILD_SHARED_LIBS=OFF
-cmake --build .
+PS git clone https://github.com/libssh2/libssh2.git
+PS cd libssh2
+PS build; cd build
+PS cmake .. -DBUILD_SHARED_LIBS=OFF
+PS cmake --build .
 ```
 
 The libssh2 cmake config package will be exported automatically
@@ -106,7 +106,7 @@ build and install this library:
 PS git clone https://github.com/Jeruntu/qlibssh2.git
 PS cd qlibssh2
 PS md build; cd build
-PS cmake .. -DCMAKE_PREFIX_PATH="$Env:QTDIR;-DCMAKE_INSTALL_PREFIX="$MyCmakePackageDir"
+PS cmake .. -DCMAKE_PREFIX_PATH="$Env:QTDIR" -DCMAKE_INSTALL_PREFIX="$MyCmakePackageDir"
 PS cmake --build .
 PS cmake --build . --target install
 ```
