@@ -1,6 +1,6 @@
 #include "QLibssh2/Ssh2Client.h"
 
-using namespace daggyssh2;
+using namespace qlibssh2;
 
 int main()
 {
