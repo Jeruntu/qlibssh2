@@ -1,5 +1,7 @@
 # qlibssh2
 
+![CI](https://github.com/jeruntu/qlibssh2/workflows/CI/badge.svg)
+
 Qt wrapper for libssh2
 
 ## Introduction
