@@ -55,8 +55,20 @@ Since this library is a Qt wrapper around libssh2, it is likely you
 have Qt pre-installed for your application. To build this library with
 your pre-installed Qt version you will have to define the QTDIR environment
 variable and set the option `local_qt_version`. If this option is not defined,
-conan will build Qt from sources. To use the package in your application /
-library, add this package as a dependency in conanfile.txt or conanfile.py:
+conan will build Qt from sources.
+
+#### Export package recipe to the local cache
+
+```powershell
+PS git clone https://github.com/Jeruntu/qlibssh2.git
+PS cd qlibssh2
+PS conan export .
+```
+
+#### Add this library as a dependency
+
+To use the package in your application / library, add this package as a dependency
+in conanfile.txt or conanfile.py:
 
 ```ini
 [requires]
@@ -67,21 +79,21 @@ cmake_paths
 cmake_find_package
 ```
 
-Build your project:
+#### Install dependencies for your project
 
 ```powershell
 PS cd $YourAppDir
 PS md build; cd build
 ```
 
-**Local pre-installed Qt:**
+#### (1) Local pre-installed Qt
 
 ```powershell
 PS $Env:QTDIR='C:\Qt\5.15.1\msvc2019_64'
-PS conan install .. -o local_qt_version='5.15.1'
+PS conan install .. -o local_qt_version='5.15.1' --build=missing
 ```
 
-To make this fixed add it to the conanfile.txt and omit the option
+To make this fixed, add it to the conanfile.txt and omit the option
 from the command line:
 
 ```ini
@@ -89,11 +101,11 @@ from the command line:
 qlibssh2:local_qt_version='5.15.1'
 ```
 
-**Or build Qt from sources (takes a while...):**
+#### (2) Or build Qt from sources (takes a while...)
 
 ```powershell
 PS conan remote add bincrafters 'https://api.bintray.com/conan/bincrafters/public-conan'
-PS conan install ..
+PS conan install .. --build=missing
 ```
 
 To change the Qt version override it:
@@ -102,6 +114,8 @@ To change the Qt version override it:
 [requires]
 qt/5.15.2
 ```
+
+#### Build project
 
 Now that all dependencies are installed by ```Conan```, the project is
 ready to be build. Pass the generated ```conan_paths.cmake``` file on
