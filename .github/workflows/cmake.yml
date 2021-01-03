@@ -58,7 +58,7 @@ jobs:
         cache-name: cache-conan
       with:
         path: ${{ env.CONAN_USER_HOME }}
-        key: host-${{ runner.os }}-${{ hashFiles('conanfile.py') }}
+        key: host-${{ runner.os }}-${{ hashFiles('qlibssh2/conanfile.py') }}
 
     - name: Install dependencies
       working-directory: ${{ runner.workspace }}/build
