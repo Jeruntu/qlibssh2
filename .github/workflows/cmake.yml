@@ -4,6 +4,8 @@ on: [push]
 
 env:
   BUILD_TYPE: Release
+  CONAN_CMAKE_GENERATOR: Ninja
+  CONAN_USER_HOME_SHORT: None
 
 defaults:
   run:
@@ -25,6 +27,9 @@ jobs:
       with:
         cmake-version: '3.19.x'
 
+    - name: Update Conan Home environment variable
+      run: echo "CONAN_USER_HOME=${{ runner.workspace }}" >> $Env:GITHUB_ENV
+
     - name: Setup Conan
       id: conan
       uses: turtlebrowser/get-conan@main
@@ -41,25 +46,34 @@ jobs:
 
     - name: Create build environment
       run: |
-        $Env:CONAN_CMAKE_GENERATOR='Ninja'
+        conan profile new default --detect
         conan profile update settings.compiler.libcxx=libstdc++11 default
         conan remote add bincrafters 'https://api.bintray.com/conan/bincrafters/public-conan'
-        md ${{runner.workspace}}/build
+        md ${{ runner.workspace }}/build
+
+    - name: Cache Conan dependencies
+      id: github-cache-conan
+      uses: actions/cache@v2
+      env:
+        cache-name: cache-conan
+      with:
+        path: ${{ env.CONAN_USER_HOME }}
+        key: host-${{ runner.os }}-${{ hashFiles('conanfile.py') }}
 
     - name: Install dependencies
-      working-directory: ${{runner.workspace}}/build
+      working-directory: ${{ runner.workspace }}/build
       run: conan install ../qlibssh2 --build=missing
 
     - name: Configure CMake
-      working-directory: ${{runner.workspace}}/build
+      working-directory: ${{ runner.workspace }}/build
       run: cmake ../qlibssh2 -G Ninja -DCMAKE_BUILD_TYPE="$BUILD_TYPE" -DCMAKE_PROJECT_QLibssh2_INCLUDE="$pwd/conan_paths.cmake"
 
     - name: Build
-      working-directory: ${{runner.workspace}}/build
+      working-directory: ${{ runner.workspace}}/build
       run: cmake --build .
 
 #     - name: Test
-#       working-directory: ${{runner.workspace}}/build
+#       working-directory: ${{ runner.workspace }}/build
 #       shell: bash
 #       # Execute tests defined by the CMake configuration.
 #       # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
