@@ -3,9 +3,8 @@ import os
 
 class Qlibssh2Conan(ConanFile):
     name = "qlibssh2"
-    version = "0.1.0"
     license = "MIT"
-    url = ""
+    url = "https://github.com/Jeruntu/qlibssh2"
     author = "Jeroen Oomkes (jeruntu@gmail.com)"
     description = "Qt wrapper for libssh2"
     topics = ("ssh", "ssh2", "qt")
@@ -29,6 +28,10 @@ class Qlibssh2Conan(ConanFile):
 
     def config_options(self):
         pass
+
+    def set_version(self):
+        stream = os.popen("git describe --match v[0-9].[0-9].[0-9] --abbrev=0 --tags")
+        self.version = stream.read().strip()[1:]
 
     def requirements(self):
         if self.options.local_qt_version:
