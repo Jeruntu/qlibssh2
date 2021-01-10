@@ -49,7 +49,9 @@ There are two ways to build this library. The easiest way is with
 [Conan](https://conan.io/), but the cmake project has been written
 in a way that Conan is just optional and all the dependencies can
 also be installed manually. For both methods, first prepare a build
-environment with your compiler and cmake.
+environment with your compiler and cmake. The following instructions
+and examples are based on Windows, but should work similarly on any
+platform.
 
 ### Conan
 
@@ -59,12 +61,12 @@ your pre-installed Qt version you will have to define the QTDIR environment
 variable and set the option `local_qt_version`. If this option is not defined,
 conan will build Qt from sources.
 
-#### Export package recipe to the local cache
+#### Add Conan repository remotes
 
 ```powershell
-PS git clone https://github.com/Jeruntu/qlibssh2.git
-PS cd qlibssh2
-PS conan export .
+conan remote add jeruntu https://api.bintray.com/conan/jeruntu/conan
+# Optional, required when not using local pre-installed Qt:
+conan remote add bincrafters https://api.bintray.com/conan/bincrafters/public-conan
 ```
 
 #### Add this library as a dependency
@@ -74,7 +76,7 @@ in conanfile.txt or conanfile.py:
 
 ```ini
 [requires]
-qlibssh2/0.1.0
+qlibssh2/0.1.0 # or any other version
 
 [generators]
 cmake_paths
@@ -100,13 +102,12 @@ from the command line:
 
 ```ini
 [options]
-qlibssh2:local_qt_version='5.15.1'
+qlibssh2:local_qt_version=5.15.1
 ```
 
 #### (2) Or build Qt from sources (takes a while...)
 
 ```powershell
-PS conan remote add bincrafters 'https://api.bintray.com/conan/bincrafters/public-conan'
 PS conan install .. --build=missing
 ```
 
