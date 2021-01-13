@@ -36,10 +36,25 @@ Qt5Network. The libssh2 library has dependencies on OpenSSL and zlib.
 ### API
 
 ```cpp
+#include "qlibssh2/Ssh2Client.h"
+
+#include <QtCore/QCoreApplication>
+
 using namespace qlibssh2;
-int main() {
-    Ssh2Client client{{}};
-    # TODO add api logic here
+
+int main(int argc, char *argv[])
+{
+    QCoreApplication app{argc, argv};
+
+    Ssh2Settings settings;
+    Ssh2Client client{settings};
+
+    QObject::connect(&client, &Ssh2Client::sessionStateChanged, [](Ssh2Client::SessionStates state) {
+        qDebug() << "state" << state;
+    });
+    client.connectToHost("jeruntu@192.168.0.1");
+
+    return app.exec();
 }
 ```
 
@@ -94,7 +109,7 @@ PS md build; cd build
 
 ```powershell
 PS $Env:QTDIR='C:\Qt\5.15.1\msvc2019_64'
-PS conan install .. -o local_qt_version='5.15.1' --build=missing
+PS conan install .. -o qlibssh2:local_qt_version='5.15.1' --build=missing
 ```
 
 To make this fixed, add it to the conanfile.txt and omit the option
@@ -122,10 +137,13 @@ qt/5.15.2
 
 Now that all dependencies are installed by ```Conan```, the project is
 ready to be build. Pass the generated ```conan_paths.cmake``` file on
-to the main cmake file of your project:
+to the main cmake file of your project. For example, a release build
+with [Ninja](https://ninja-build.org/) generator:
 
 ```powershell
-PS cmake .. "-DCMAKE_PROJECT_$(APP_PROJECT_NAME)_INCLUDE=$pwd/conan_paths.cmake"
+PS $Path = "$pwd".Replace('\', '/') # cmake expects forward slashes
+PS cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release `
+"-DCMAKE_PROJECT_$($APP_PROJECT_NAME)_INCLUDE=$Path/conan_paths.cmake"
 PS cmake --build .
 ```
 
