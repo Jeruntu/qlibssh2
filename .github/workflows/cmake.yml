@@ -23,7 +23,7 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Setup cmake
-      uses: jwlawson/actions-setup-cmake@v1.5
+      uses: jwlawson/actions-setup-cmake@v1.6
       with:
         cmake-version: '3.19.x'
 
