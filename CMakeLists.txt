@@ -27,6 +27,8 @@ add_library(qlibssh2 STATIC
     src/include/Ssh2Process.h
     src/include/Ssh2Scp.h
     src/include/Ssh2Types.h
+    src/include/Ssh2Debug.h
+    src/include/Ssh2Channel.h
 )
 
 target_include_directories(qlibssh2
