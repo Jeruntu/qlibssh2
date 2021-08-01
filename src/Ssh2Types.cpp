@@ -42,7 +42,7 @@ public:
     {
         switch (static_cast<Ssh2Error>(ev)) {
         case ErrorReadKnownHosts:
-            return "Error in read known hosts file";
+            return "Error in reading known hosts file";
         case ErrorWriteKnownHosts:
             return "Error in writing to known hosts file";
         case SessionStartupError:
