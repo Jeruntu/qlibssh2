@@ -27,6 +27,8 @@ add_library(qlibssh2 STATIC
     src/include/Ssh2Process.h
     src/include/Ssh2Scp.h
     src/include/Ssh2Types.h
+    src/include/Ssh2Debug.h
+    src/include/Ssh2Channel.h
 )
 
 target_include_directories(qlibssh2
@@ -46,36 +48,37 @@ target_link_libraries(qlibssh2
 
 target_compile_features(qlibssh2 PUBLIC cxx_std_17)
 
-# --- Create installed package
-include(CMakePackageConfigHelpers)
-include(GNUInstallDirs)
-set(PACKAGE_NAME ${CMAKE_PROJECT_NAME})
+if(NOT ${QLIBSSH2_SKIP_INSTALL_PACKAGE})
+    # --- Create installed package
+    include(CMakePackageConfigHelpers)
+    include(GNUInstallDirs)
+    set(PACKAGE_NAME ${CMAKE_PROJECT_NAME})
 
-set(TARGETS_FILE ${CMAKE_INSTALL_LIBDIR}/cmake/${PACKAGE_NAME}/${PACKAGE_NAME}Targets.cmake)
-configure_package_config_file(
-    cmake/${PACKAGE_NAME}Config.cmake.in
-    ${CMAKE_BINARY_DIR}/${PACKAGE_NAME}Config.cmake
-    INSTALL_DESTINATION
-        ${CMAKE_INSTALL_LIBDIR}/cmake/${PACKAGE_NAME}
-    PATH_VARS
-        TARGETS_FILE
-)
-
-get_filename_component(TARGETS_FILE_WLE ${TARGETS_FILE} NAME_WLE)
-install(TARGETS qlibssh2
-    EXPORT ${TARGETS_FILE_WLE}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-)
-install(EXPORT ${TARGETS_FILE_WLE}
-    NAMESPACE QLIBSSH2::
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PACKAGE_NAME}
-)
-install(
-    FILES
+    set(TARGETS_FILE ${CMAKE_INSTALL_LIBDIR}/cmake/${PACKAGE_NAME}/${PACKAGE_NAME}Targets.cmake)
+    configure_package_config_file(
+        cmake/${PACKAGE_NAME}Config.cmake.in
         ${CMAKE_BINARY_DIR}/${PACKAGE_NAME}Config.cmake
-    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PACKAGE_NAME}
-)
-install(DIRECTORY src/include/
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PACKAGE_NAME}
-)
+        INSTALL_DESTINATION
+        ${CMAKE_INSTALL_LIBDIR}/cmake/${PACKAGE_NAME}
+        PATH_VARS
+        TARGETS_FILE
+        )
 
+    get_filename_component(TARGETS_FILE_WLE ${TARGETS_FILE} NAME_WLE)
+    install(TARGETS qlibssh2
+        EXPORT ${TARGETS_FILE_WLE}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        )
+    install(EXPORT ${TARGETS_FILE_WLE}
+        NAMESPACE QLIBSSH2::
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PACKAGE_NAME}
+        )
+    install(
+        FILES
+        ${CMAKE_BINARY_DIR}/${PACKAGE_NAME}Config.cmake
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PACKAGE_NAME}
+        )
+    install(DIRECTORY src/include/
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PACKAGE_NAME}
+        )
+endif()

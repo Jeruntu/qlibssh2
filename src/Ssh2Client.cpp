@@ -32,6 +32,7 @@ SOFTWARE.
 
 #include <QtCore/QTimer>
 #include <QtNetwork/QHostAddress>
+#include <QCoreApplication>
 
 using namespace qlibssh2;
 
@@ -42,17 +43,15 @@ std::atomic<size_t> ssh2_initializations_count(0);
 
 void initializeSsh2()
 {
-    if (ssh2_initializations_count == 0)
+    if (ssh2_initializations_count == 0) {
         libssh2_init(0);
+        QObject::connect(QCoreApplication::instance(), &QCoreApplication::aboutToQuit,
+                         QCoreApplication::instance(), []()
+        {
+            libssh2_exit();
+        });
+    }
     ssh2_initializations_count++;
-};
-
-void freeSsh2()
-{
-    if (ssh2_initializations_count == 1)
-        libssh2_exit();
-    if (ssh2_initializations_count > 0)
-        ssh2_initializations_count--;
 };
 
 ssize_t libssh_recv(int socket, void* buffer, size_t length, int flags, void** abstract)
@@ -104,7 +103,6 @@ Ssh2Client::~Ssh2Client()
     closeSession();
     if (state() == ConnectedState)
         waitForDisconnected();
-    freeSsh2();
 }
 
 void Ssh2Client::connectToHost(const QString& hostName, qint16 port)
