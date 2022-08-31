@@ -101,7 +101,7 @@ Ssh2Client::Ssh2Client(Ssh2Settings ssh2_settings,
 Ssh2Client::~Ssh2Client()
 {
     closeSession();
-    if (state() == ConnectedState)
+    if (state() != UnconnectedState)
         waitForDisconnected();
 }
 
