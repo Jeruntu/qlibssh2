@@ -85,7 +85,8 @@ void Ssh2Process::onSsh2ChannelStateChanged(const ChannelStates& state)
 std::error_code Ssh2Process::execSsh2Process()
 {
     std::error_code error_code = ssh2_success;
-    const int ssh2_method_result = libssh2_channel_exec(ssh2Channel(), qPrintable(command_));
+    const QByteArray command = command_.toLocal8Bit();
+    const int ssh2_method_result = libssh2_channel_exec(ssh2Channel(), command.constData());
     switch (ssh2_method_result) {
     case LIBSSH2_ERROR_EAGAIN:
         setSsh2ProcessState(Starting);

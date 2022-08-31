@@ -44,6 +44,8 @@ target_link_libraries(qlibssh2
         Qt6::Core
         Qt6::Network
         Libssh2::libssh2
+    PRIVATE
+        Qt::CorePrivate
 )
 
 target_compile_features(qlibssh2 PUBLIC cxx_std_17)
