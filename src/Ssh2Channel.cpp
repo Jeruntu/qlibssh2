@@ -27,6 +27,9 @@ SOFTWARE.
 
 #include <libssh2.h>
 
+//Qt includes
+#include <private/qiodevice_p.h>
+
 using namespace qlibssh2;
 
 Ssh2Channel::Ssh2Channel(Ssh2Client* ssh2_client)
@@ -75,6 +78,11 @@ qint64 Ssh2Channel::readData(char* data, qint64 maxlen)
 
         result = -1;
     }
+
+    if(result == LIBSSH2_ERROR_EAGAIN) {
+        return 0;
+    }
+
     return result;
 }
 
@@ -181,11 +189,14 @@ std::error_code Ssh2Channel::openChannelSession()
         setSsh2ChannelState(Opening);
         error_code = Ssh2Error::TryAgain;
         break;
-    case 0:
+    case 0: {
         QIODevice::open(QIODevice::ReadWrite | QIODevice::Unbuffered);
         setSsh2ChannelState(Opened);
+        QIODevicePrivate *d = reinterpret_cast<QIODevicePrivate *>(Ssh2Channel::d_ptr.data());
+        d->setReadChannelCount(2);
         error_code = ssh2_success;
         break;
+    }
     default: {
         debugSsh2Error(ssh2_method_result);
         error_code = Ssh2Error::FailedToOpenChannel;
@@ -200,7 +211,7 @@ std::error_code Ssh2Channel::closeChannelSession()
     std::error_code error_code = ssh2_success;
     libssh2_channel_flush_ex(ssh2_channel_, 0);
     libssh2_channel_flush_ex(ssh2_channel_, 1);
-    const int ssh2_method_result = libssh2_channel_send_eof(ssh2_channel_);
+    const int ssh2_method_result = libssh2_channel_close(ssh2_channel_);
     switch (ssh2_method_result) {
     case LIBSSH2_ERROR_EAGAIN:
         setSsh2ChannelState(ChannelStates::Closing);
@@ -216,8 +227,9 @@ std::error_code Ssh2Channel::closeChannelSession()
                                                            nullptr,
                                                            nullptr,
                                                            nullptr);
-        if (result == 0)
+        if (result == 0) {
             exit_signal_ = QString(exit_signal);
+        }
         destroyChannel();
     } break;
     default: {
@@ -249,9 +261,11 @@ void Ssh2Channel::checkChannelData(const Ssh2Channel::ChannelStream& stream_id)
         setCurrentReadChannel(1);
         break;
     }
+
     const QByteArray data = readAll();
-    if (data.size())
+    if (data.size()) {
         emit newChannelData(data, stream_id);
+    }
 }
 
 QString Ssh2Channel::exitSignal() const
